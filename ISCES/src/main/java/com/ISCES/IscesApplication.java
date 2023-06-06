@@ -1,13 +1,12 @@
-package com.example.demo;
+package com.ISCES;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class DemoApplication {
-
+public class IscesApplication {
 	public static void main(String[] args) {
-		SpringApplication.run(DemoApplication.class, args);
+		SpringApplication.run(IscesApplication.class, args);
 	}
 
 }
