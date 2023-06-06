@@ -1,10 +1,10 @@
-package com.ISCES;
+package com.example.demo;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class IscesApplicationTests {
+class DemoApplicationTests {
 
 	@Test
 	void contextLoads() {
