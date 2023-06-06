@@ -22,6 +22,7 @@ import java.util.List;
 @Setter
 @Getter
 @RestController
+@CrossOrigin("https://iztechelection.vercel.app/")
 public class StudentController { // Bütün return typeler değişebilir . Response ve Request packageına yeni classlar eklenmeli frontendden hangi bilgi istendiğine göre
 
     private StudentService studentService;

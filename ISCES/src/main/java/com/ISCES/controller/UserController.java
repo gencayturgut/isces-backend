@@ -23,7 +23,7 @@ import java.util.List;
 
 
 @RestController
-@CrossOrigin("http://localhost:3000")
+@CrossOrigin("https://iztechelection.vercel.app/")
 public class UserController { // Bütün return typeler değişebilir . Response ve Request packageına yeni classlar eklenmeli frontendden hangi bilgi istendiğine göre
 
 
@@ -150,7 +150,5 @@ public class UserController { // Bütün return typeler değişebilir . Response
     public List<Delegate> getAllDelegates(){
         return delegateService.getAllDelegates();
     }
-user controllera
-gitcek
 
 }
