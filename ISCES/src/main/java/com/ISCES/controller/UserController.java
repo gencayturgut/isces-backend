@@ -4,17 +4,14 @@ package com.ISCES.controller;
 import com.ISCES.entities.*;
 import com.ISCES.repository.DelegateRepo;
 import com.ISCES.repository.DepartmentRepo;
+import com.ISCES.request.LoginRequest;
 import com.ISCES.response.LoginResponse;
 import com.ISCES.response.isInEletionProcessResponse;
 import com.ISCES.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 import java.time.LocalDateTime;
@@ -58,8 +55,10 @@ public class UserController { // Bütün return typeler değişebilir . Response
 
 
 
-    @GetMapping("/login/{email}/{password}")// user logins with email and password
-    public ResponseEntity<LoginResponse> login(@PathVariable String email, @PathVariable String password) {
+    @PostMapping("/login")// user logins with email and password
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
+        String email = loginRequest.getEmail();
+        String password = loginRequest.getPassword();
         LocalDateTime now = LocalDateTime.now();
         String controller = "";// message for frontend  (Logged-in )
         User user = userService.findByEmail(email);
@@ -96,7 +95,7 @@ public class UserController { // Bütün return typeler değişebilir . Response
                 return new ResponseEntity<>(new LoginResponse(400, "Invalid Requests"), HttpStatus.BAD_REQUEST);
             }
         }
-        catch (UsernameNotFoundException exception){
+        catch (Exception e){
             return new ResponseEntity<>(new LoginResponse(400, "Email does not exists!"), HttpStatus.BAD_REQUEST);
         }
         return null;
