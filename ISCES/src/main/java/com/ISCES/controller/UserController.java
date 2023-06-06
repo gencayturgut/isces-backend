@@ -2,7 +2,10 @@ package com.ISCES.controller;
 
 
 import com.ISCES.entities.*;
+import com.ISCES.repository.DelegateRepo;
+import com.ISCES.repository.DepartmentRepo;
 import com.ISCES.response.LoginResponse;
+import com.ISCES.response.isInEletionProcessResponse;
 import com.ISCES.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -30,15 +34,20 @@ public class UserController { // Bütün return typeler değişebilir . Response
     private AdminService adminService;
     private ElectionService electionService;
 
+    private DepartmentRepo departmentRepo;
 
-    @Autowired
-    public UserController(UserService userService, CandidateService candidateService, StudentService studentService, AdminService adminService, ElectionService electionService) {
+    private DelegateService delegateService;
+
+
+
+    public UserController(DelegateService delegateService, DepartmentRepo  departmentRepo, UserService userService, CandidateService candidateService, StudentService studentService, AdminService adminService, ElectionService electionService) {
         this.userService = userService;
         this.candidateService = candidateService;
         this.studentService = studentService;
         this.adminService = adminService;
         this.electionService = electionService;
-    }
+        this.departmentRepo = departmentRepo;
+        this.delegateService = delegateService;}
 
 
 
@@ -96,25 +105,52 @@ public class UserController { // Bütün return typeler değişebilir . Response
 
 
     @GetMapping("/isInElectionProcess") // checks whether in election process or not
-    public boolean checkElectionInitialization(){
+    public boolean checkElectionInitialization() {
         LocalDateTime now = LocalDateTime.now();
         Election election = electionService.findByIsFinished(false);
-        if(electionService.isThereStartedElection(now)){
-            return true; // if we are in election process
-        }
-        else if(election != null) {
+        if (electionService.isThereStartedElection(now)) {
+            return true; // we are in election
+        } else if (election != null) {
             if (!electionService.isThereStartedElection(now) && electionService.findByIsFinished(false).getEndDate().isBefore(now)) {//  if election finished...
                 Election tempElection = electionService.findByIsFinished(false);
                 tempElection.setFinished(true);
                 electionService.save(tempElection);
+                Long max = Long.valueOf(0);
+                Long delegateId = Long.valueOf(1);
+                List<Department> departmentList = departmentRepo.findAll();
+                for (Department department : departmentRepo.findAll()) {
+                    List<Candidate> candidateList = candidateService.findCandidateByDepartmentId(department.getDepartmentId());
+                    if(candidateList.size() != 0){
+                        for (Candidate candidate : candidateList) {
+                            if (candidate.getVotes() > max) {
+                                max = candidate.getVotes();
+                            }
+                        }
+                        Candidate candidate = candidateService.findByVotes(max);
+                        if(candidate != null) {
+                            User user = candidate.getStudent().getUser();
+                            user.setRole("representative"); // role is setted as representative
+ //  candidate ,user and student  saved the changes.
+                            Delegate delegate = new Delegate(delegateId, candidate); // new delegate has been created.
+                            delegateService.save(delegate);
+                            // added representative to list.
+                            delegateId = delegateId + Long.valueOf(1);
+                        }
+                    }
+
+                }
                 return false; //  returns false and updates database.
             }
         }
+        return false; // if we are not in election
 
 
-        return false; // if election is not setted yet
     }
-
-
+@GetMapping("/allDelegates")
+    public List<Delegate> getAllDelegates(){
+        return delegateService.getAllDelegates();
+    }
+user controllera
+gitcek
 
 }

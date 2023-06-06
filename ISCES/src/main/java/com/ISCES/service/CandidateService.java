@@ -47,7 +47,7 @@ public class CandidateService {
 
     @Transactional
     public List<Candidate> findCandidateByDepartmentId(Long departmentId){
-        return candidateRepo.findByStudent_DepartmentId(departmentId);
+        return candidateRepo.findByStudent_Department_DepartmentId(departmentId);
     }
 
 
@@ -59,4 +59,15 @@ public class CandidateService {
     public void deleteCandidate(Candidate candidate){
         candidateRepo.delete(candidate);
     }
+
+    @Transactional
+    public Candidate findByVotes(Long votes){
+        return candidateRepo.findByVotes(votes);
+    }
+
+    @Transactional
+    public void deleteAll(){
+        candidateRepo.deleteAll();
+    }
+
 }

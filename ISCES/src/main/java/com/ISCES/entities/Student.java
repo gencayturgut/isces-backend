@@ -18,8 +18,9 @@ public class Student {
     @Column(name="student_number")
     private Long studentNumber;
 
-    @Column(name="department_id")
-    private Long departmentId;
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name="department_id")
+    private Department department;
 
     @Column(name="first_name")
     private String firstName;

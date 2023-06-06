@@ -9,5 +9,5 @@ import java.util.List;
 @Repository
 public interface AdminRepo extends JpaRepository<Admin,Long> {
     Admin findByUser_Email(String email);
-    Admin findByDepartmentId(Long departmentId);
+    Admin findByDepartment_DepartmentId(Long departmentId);
 }

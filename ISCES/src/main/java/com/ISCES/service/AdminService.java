@@ -24,7 +24,7 @@ public class AdminService {
     }
 
     public Admin findByDepartmentId(Long departmentId){
-        return adminRepo.findByDepartmentId(departmentId);
+        return adminRepo.findByDepartment_DepartmentId(departmentId);
     }
 
 

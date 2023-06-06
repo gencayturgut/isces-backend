@@ -14,7 +14,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-@Table(name="users")
+@Table(name="user")
 public class User {
 
     @Id

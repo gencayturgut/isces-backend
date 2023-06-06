@@ -7,7 +7,5 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class IscesApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(IscesApplication.class, args);
-		System.out.println("selam");
 	}
-
 }

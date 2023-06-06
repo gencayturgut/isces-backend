@@ -9,6 +9,8 @@ DROP TABLE IF EXISTS `student`;
 DROP TABLE IF EXISTS `candidate`;
 DROP TABLE IF EXISTS `admin`;
 DROP TABLE IF EXISTS `election`;
+DROP TABLE IF EXISTS `department`;
+DROP TABLE IF EXISTS `delegate`;
 
 
 
@@ -73,6 +75,18 @@ CREATE TABLE `files` (
   `file_path` VARCHAR(255),
   `folder_id` BIGINT
 )ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TABLE `department` (
+  `department_id` BIGINT NOT NULL,
+  `department_name` varchar(50) NOT NULL,
+  PRIMARY KEY (`department_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TABLE `delegate` (
+  `delegate_id` BIGINT NOT NULL,
+  `candidate_id` BIGINT NOT NULL,
+  PRIMARY KEY (`delegate_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 
@@ -145,6 +159,15 @@ VALUES
 (3,'officer3firstname','officer3lastname','officer3@ofc.iyte.edu.tr',3),
 (4,'officer4firstname','officer4lastname','officer4@ofc.iyte.edu.tr',4),
 (5,'rectorfirstname','rectorlastname','rector@rct.iyte.edu.tr',null);
+
+INSERT INTO `department`
+VALUES
+(1,'1'),
+(2,'2'),
+(3,'3'),
+(4,'4');
+
+
 
 
 

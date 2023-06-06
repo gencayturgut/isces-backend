@@ -1,12 +1,11 @@
 package com.ISCES.controller;
 
-import com.ISCES.entities.Candidate;
-import com.ISCES.entities.Election;
-import com.ISCES.entities.Student;
+import com.ISCES.entities.*;
 import com.ISCES.request.ElectionRequest;
 import com.ISCES.service.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
 import org.springframework.http.ResponseEntity;
@@ -26,13 +25,20 @@ public class AdminController {// Bütün return typeler değişebilir . Response
     private AdminService adminService;
     private StudentService studentService;
     private ElectionService electionService;
+    private DelegateService delegateService;
+    private EmailService emailService;
+    private Email2Service email2Service;
 
-    public AdminController(CandidateService candidateService, UserService userService, StudentService studentService, AdminService adminService,ElectionService electionService) {
+
+    public AdminController(Email2Service email2Service, EmailService emailService, DelegateService delegateService, CandidateService candidateService, UserService userService, StudentService studentService, AdminService adminService,ElectionService electionService) {
+        this.emailService = emailService;
         this.candidateService = candidateService;
         this.userService = userService;
         this.studentService = studentService;
         this.adminService = adminService;
         this.electionService = electionService;
+        this.delegateService = delegateService;
+        this.email2Service = email2Service;
     }
 
 
@@ -73,7 +79,7 @@ public class AdminController {// Bütün return typeler değişebilir . Response
             Candidate savedCandidate = candidateService.save(tempCandidate);
             return candidateService.save(tempCandidate); // it returns the candidate who is approved by officer.
         }
-        // mail yollanacak adaylığı kabul edilen öğrenciye
+        emailService.sendEmail(studentService.findByStudentNumber(studentNumber).getUser().getEmail(),true); //  sends email for confirmed students.
         return tempCandidate;
     }
 
@@ -85,7 +91,7 @@ public class AdminController {// Bütün return typeler değişebilir . Response
             studentService.findByStudentNumber(studentNumber).setIsAppliedForCandidacy(null); // isAppliedCandidacy of student is changed to null
             return studentService.save(studentService.findByStudentNumber(studentNumber));// It returns and saves the student who is rejected by officer.
         }
-        // reddedilen öğrenciye mail yollanıcak.
+        emailService.sendEmail(studentService.findByStudentNumber(studentNumber).getUser().getEmail(),false); //  sends email for rejected students
         return null;
     }
 
@@ -102,6 +108,7 @@ public class AdminController {// Bütün return typeler değişebilir . Response
                 tempElection.setFinished(false);
                 tempElection.setStartDate(electionRequest.getStartDate());
                 tempElection.setEndDate(electionRequest.getEndDate());
+
                 for (Student student : studentService.getAllStudents()) {
                     if (student.isVoted()) { //  isVoted of voters are changed to false  for next year election
                         student.setVoted(false);
@@ -111,12 +118,13 @@ public class AdminController {// Bütün return typeler değişebilir . Response
                         student.getUser().setRole("student");
                     }
                 }
-                for (Candidate candidate : candidateService.getAllCandidates()) { //  candidates are deleted.
-                    candidateService.deleteCandidate(candidate);
-                }
-                // mail yollama eklenecek
+                candidateService.deleteAll(); // candidates are deleted.
+                delegateService.deleteAll(); // delegates are deleted.
                 try {
                     electionService.save(tempElection);
+                    for(Student student: studentService.getAllStudents()){ //  sends all students election start date and end date.
+                        email2Service.sendEmail(student.getUser().getEmail(),electionRequest.getStartDate(),electionRequest.getEndDate());
+                    }
                     return new ResponseEntity<>(new ElectionRequest(electionRequest.getStartDate(), electionRequest.getEndDate()), HttpStatus.OK);
                 } catch (Exception e) {
                     return new ResponseEntity<>(new ElectionRequest("Election couldn't be setted."), HttpStatus.BAD_REQUEST);

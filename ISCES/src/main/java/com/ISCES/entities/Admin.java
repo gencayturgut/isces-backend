@@ -27,8 +27,8 @@ public class Admin   {
     @Column(name="last_name")
     private String lastName;
 
-    @Column(name="department_id")
-    private Long departmentId; // it's null for rector.
-
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name="department_id")
+    private Department department; // it's null for rector.
 
 }

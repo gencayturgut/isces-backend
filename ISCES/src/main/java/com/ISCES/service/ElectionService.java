@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -53,5 +54,7 @@ public class ElectionService {
         return election != null; // checks is there  entered election
     }
 
-
+    public Election findByElectionId(Long electionId) {
+        return electionRepo.findByElectionId(electionId);
+    }
 }

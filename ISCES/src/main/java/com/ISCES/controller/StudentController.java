@@ -56,9 +56,9 @@ public class StudentController { // Bütün return typeler değişebilir . Respo
     // studentNumber is voter's number, departmentıd "is candidate's id.
     public ResponseEntity<VoteResponse> vote(@PathVariable Long studentNumber, @PathVariable Long candidateId) {
         String message = "Couldn't vote";
-        List<Candidate> candidateList = candidateService.findCandidateByDepartmentId(studentService.findByStudentNumber(studentNumber).getDepartmentId());
+        List<Candidate> candidateList = candidateService.findCandidateByDepartmentId(studentService.findByStudentNumber(studentNumber).getDepartment().getDepartmentId());
         if (!studentService.findByStudentNumber(studentNumber).isVoted() &&
-                studentService.findByStudentNumber(studentNumber).getDepartmentId().equals(candidateService.findById(candidateId).getStudent().getDepartmentId())) {
+                studentService.findByStudentNumber(studentNumber).getDepartment().equals(candidateService.findById(candidateId).getStudent().getDepartment())){
             // if student didn't vote   and departmentId of student and departmentId of candidate is equal.
             studentService.findByStudentNumber(studentNumber).setVoted(true); //  the isVoted of voter is changed.
             candidateService.getVote(candidateService.findById(candidateId)); // candidate's vote += 1
