@@ -10,6 +10,7 @@ import com.ISCES.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -69,26 +70,26 @@ public class UserController { // Bütün return typeler değişebilir . Response
             controller = "Logged-in";
         }
         try {
-                if((controller.equals("Logged-in"))){
-                    if(user.getRole().equals("student")) { //  login response for student
-                        // Http status 2**
-                        Student student = studentService.findByUser_Email(email);
-                        return new ResponseEntity<>(new LoginResponse(200, controller, student,isElectionStarted), HttpStatus.OK);
-                    }
-                    else if(user.getRole().equals("candidate")){ //  login response for candidate
-                        Student student = studentService.findByUser_Email(email);
-                        Candidate candidate = candidateService.findByStudent_StudentNumber(student.getStudentNumber());
-                        return new ResponseEntity<>(new LoginResponse(200, controller, candidate,isElectionStarted), HttpStatus.OK);
-                    }
-                    else if(user.getRole().equals("officer")){ //  login response for candidate
-                        Admin officer = adminService.findByUser_Email(email);
-                        return new ResponseEntity<>(new LoginResponse(200, controller, officer,isElectionStarted), HttpStatus.OK);
-                    }
+            if((controller.equals("Logged-in"))){
+                if(user.getRole().equals("student")) { //  login response for student
+                    // Http status 2**
+                    Student student = studentService.findByUser_Email(email);
+                    return new ResponseEntity<>(new LoginResponse(200, controller, student,isElectionStarted), HttpStatus.OK);
+                }
+                else if(user.getRole().equals("candidate")){ //  login response for candidate
+                    Student student = studentService.findByUser_Email(email);
+                    Candidate candidate = candidateService.findByStudent_StudentNumber(student.getStudentNumber());
+                    return new ResponseEntity<>(new LoginResponse(200, controller, candidate,isElectionStarted), HttpStatus.OK);
+                }
+                else if(user.getRole().equals("officer")){ //  login response for candidate
+                    Admin officer = adminService.findByUser_Email(email);
+                    return new ResponseEntity<>(new LoginResponse(200, controller, officer,isElectionStarted), HttpStatus.OK);
+                }
 
-                    else if(user.getRole().equals("rector")){ //  login response for candidate
-                        Admin rector = adminService.findByUser_Email(email);
-                        return new ResponseEntity<>(new LoginResponse(200, controller, rector,isElectionStarted), HttpStatus.OK);
-                    }
+                else if(user.getRole().equals("rector")){ //  login response for candidate
+                    Admin rector = adminService.findByUser_Email(email);
+                    return new ResponseEntity<>(new LoginResponse(200, controller, rector,isElectionStarted), HttpStatus.OK);
+                }
 
             }
 
@@ -97,7 +98,7 @@ public class UserController { // Bütün return typeler değişebilir . Response
                 return new ResponseEntity<>(new LoginResponse(400, "Invalid Requests"), HttpStatus.BAD_REQUEST);
             }
         }
-        catch (Exception e){
+        catch (UsernameNotFoundException exception){
             return new ResponseEntity<>(new LoginResponse(400, "Email does not exists!"), HttpStatus.BAD_REQUEST);
         }
         return null;
@@ -133,7 +134,7 @@ public class UserController { // Bütün return typeler değişebilir . Response
                         if(candidate != null) {
                             User user = candidate.getStudent().getUser();
                             user.setRole("representative"); // role is setted as representative
- //  candidate ,user and student  saved the changes.
+                            //  candidate ,user and student  saved the changes.
                             Delegate delegate = new Delegate(delegateId, candidate); // new delegate has been created.
                             delegateService.save(delegate);
                             // added representative to list.
