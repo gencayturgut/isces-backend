@@ -20,7 +20,7 @@ import java.util.List;
 
 
 @RestController
-@CrossOrigin("https://iztechelection.vercel.app/")
+@CrossOrigin("http://localhost:3000")
 public class UserController { // Bütün return typeler değişebilir . Response ve Request packageına yeni classlar eklenmeli frontendden hangi bilgi istendiğine göre
 
 
