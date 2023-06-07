@@ -13,11 +13,11 @@ import org.springframework.web.bind.annotation.*;
 
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 @Getter
 @Setter
 @RestController
-@CrossOrigin("https://iztechelection.vercel.app/")
 public class AdminController {// Bütün return typeler değişebilir . Response ve Request packageına yeni classlar eklenmeli frontendden hangi bilgi istendiğine göre
 
 
@@ -80,7 +80,7 @@ public class AdminController {// Bütün return typeler değişebilir . Response
             Candidate savedCandidate = candidateService.save(tempCandidate);
             return candidateService.save(tempCandidate); // it returns the candidate who is approved by officer.
         }
-        emailService.sendEmail(studentService.findByStudentNumber(studentNumber).getUser().getEmail(),true); //  sends email for confirmed students.
+       // emailService.sendEmail(studentService.findByStudentNumber(studentNumber).getUser().getEmail(),true); //  sends email for confirmed students.
         return tempCandidate;
     }
 
@@ -92,19 +92,27 @@ public class AdminController {// Bütün return typeler değişebilir . Response
             studentService.findByStudentNumber(studentNumber).setIsAppliedForCandidacy(null); // isAppliedCandidacy of student is changed to null
             return studentService.save(studentService.findByStudentNumber(studentNumber));// It returns and saves the student who is rejected by officer.
         }
-        emailService.sendEmail(studentService.findByStudentNumber(studentNumber).getUser().getEmail(),false); //  sends email for rejected students
+       // emailService.sendEmail(studentService.findByStudentNumber(studentNumber).getUser().getEmail(),false); //  sends email for rejected students
         return null;
     }
 
 
-  @PostMapping("/enterElectionDate") //  rector enters election date.
-   public ResponseEntity<ElectionRequest> enterElectionDate(@RequestBody ElectionRequest electionRequest){
+
+
+
+
+    @GetMapping("/enterElectionDate/{startDate}/{endDate}") //  rector enters election date.
+    public ResponseEntity<ElectionRequest> enterElectionDate(@PathVariable String startDate,@PathVariable String endDate){
+        LocalDateTime start = LocalDateTime.parse(startDate);
+        LocalDateTime end= LocalDateTime.parse(endDate);
+        ElectionRequest electionRequest=new ElectionRequest(start,end);
         LocalDateTime now = LocalDateTime.now();// current date
-        Long electionId;
+      Long electionId;
         Election tempElection = new Election();
         if(!electionService.isEnteredElectionDateByRector()) { // if rector didn't set an election.
             if (electionRequest.getStartDate().isAfter(now) && electionRequest.getEndDate().isAfter(now) && electionRequest.getStartDate().isBefore(electionRequest.getEndDate())) { // if rector enters notvalid date for now.
                 electionId = Long.valueOf(electionService.getAllElections().size() + 1);
+
                 tempElection.setElectionId(electionId);
                 tempElection.setFinished(false);
                 tempElection.setStartDate(electionRequest.getStartDate());
@@ -113,7 +121,7 @@ public class AdminController {// Bütün return typeler değişebilir . Response
                 for (Student student : studentService.getAllStudents()) {
                     if (student.isVoted()) { //  isVoted of voters are changed to false  for next year election
                         student.setVoted(false);
-                    } else if (student.getIsAppliedForCandidacy()) { // changed to false for all students
+                    } else if (student.getIsAppliedForCandidacy()!=false) { // changed to false for all students
                         student.setIsAppliedForCandidacy(false);
                     } else if (student.getUser().getRole().equals("candidate")) { //  changed false for  next year election
                         student.getUser().setRole("student");
@@ -124,7 +132,7 @@ public class AdminController {// Bütün return typeler değişebilir . Response
                 try {
                     electionService.save(tempElection);
                     for(Student student: studentService.getAllStudents()){ //  sends all students election start date and end date.
-                        email2Service.sendEmail(student.getUser().getEmail(),electionRequest.getStartDate(),electionRequest.getEndDate());
+                        //email2Service.sendEmail(student.getUser().getEmail(),electionRequest.getStartDate(),electionRequest.getEndDate());
                     }
                     return new ResponseEntity<>(new ElectionRequest(electionRequest.getStartDate(), electionRequest.getEndDate()), HttpStatus.OK);
                 } catch (Exception e) {
@@ -138,5 +146,17 @@ public class AdminController {// Bütün return typeler değişebilir . Response
     }
 
 
+    @GetMapping("/electionDate")
+    public Election getElectionDate(){
+        List<Election> elections= new ArrayList<Election>();
+        elections=electionService.getAllElections();
+        for(Election election: elections){
+            if(!election.isFinished()){
+                return election;
+            }
+
+        }
+        return null;
+    }
 
 }

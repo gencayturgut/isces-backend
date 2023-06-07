@@ -4,18 +4,23 @@ package com.ISCES.controller;
 import com.ISCES.entities.*;
 import com.ISCES.repository.DelegateRepo;
 import com.ISCES.repository.DepartmentRepo;
-import com.ISCES.request.LoginRequest;
 import com.ISCES.response.LoginResponse;
 import com.ISCES.response.isInEletionProcessResponse;
 import com.ISCES.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
 
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -55,10 +60,8 @@ public class UserController { // Bütün return typeler değişebilir . Response
 
 
 
-    @PostMapping("/login")// user logins with email and password
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
-        String email = loginRequest.getEmail();
-        String password = loginRequest.getPassword();
+    @GetMapping("/login/{email}/{password}")// user logins with email and password
+    public ResponseEntity<LoginResponse> login(@PathVariable String email, @PathVariable String password) {
         LocalDateTime now = LocalDateTime.now();
         String controller = "";// message for frontend  (Logged-in )
         User user = userService.findByEmail(email);
@@ -95,7 +98,7 @@ public class UserController { // Bütün return typeler değişebilir . Response
                 return new ResponseEntity<>(new LoginResponse(400, "Invalid Requests"), HttpStatus.BAD_REQUEST);
             }
         }
-        catch (Exception e){
+        catch (UsernameNotFoundException exception){
             return new ResponseEntity<>(new LoginResponse(400, "Email does not exists!"), HttpStatus.BAD_REQUEST);
         }
         return null;
@@ -120,7 +123,9 @@ public class UserController { // Bütün return typeler değişebilir . Response
                 for (Department department : departmentRepo.findAll()) {
                     List<Candidate> candidateList = candidateService.findCandidateByDepartmentId(department.getDepartmentId());
                     if(candidateList.size() != 0){
+                        List<Integer> voteList = new ArrayList<Integer>();
                         for (Candidate candidate : candidateList) {
+                            voteList.add(candidate.getVotes().intValue());
                             if (candidate.getVotes() > max) {
                                 max = candidate.getVotes();
                             }
@@ -142,12 +147,12 @@ public class UserController { // Bütün return typeler değişebilir . Response
             }
         }
         return false; // if we are not in election
-
-
     }
-@GetMapping("/allDelegates")
+    @GetMapping("/allDelegates")
     public List<Delegate> getAllDelegates(){
         return delegateService.getAllDelegates();
     }
+
+
 
 }

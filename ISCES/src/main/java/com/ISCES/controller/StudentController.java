@@ -22,7 +22,6 @@ import java.util.List;
 @Setter
 @Getter
 @RestController
-@CrossOrigin("https://iztechelection.vercel.app/")
 public class StudentController { // Bütün return typeler değişebilir . Response ve Request packageına yeni classlar eklenmeli frontendden hangi bilgi istendiğine göre
 
     private StudentService studentService;
@@ -72,7 +71,7 @@ public class StudentController { // Bütün return typeler değişebilir . Respo
         // GETMAPPING DEĞİŞECEK
 
 
-    @GetMapping("/applyToBeCandidate/{studentNumber}")// it's for students to apply to be a candidate         !!!!!!!!! BELGE EKLEME YAPARKEN BU KISIMDA DEĞİŞİKLİK YAPILACAK !!!!!
+        @GetMapping("/applyToBeCandidate/{studentNumber}")// it's for students to apply to be a candidate         !!!!!!!!! BELGE EKLEME YAPARKEN BU KISIMDA DEĞİŞİKLİK YAPILACAK !!!!!
     public ResponseEntity<CandidacyRequest> applyToBeCandidate(@PathVariable Long studentNumber) {
         LocalDateTime now = LocalDateTime.now();
         if(electionService.isEnteredElectionDateByRector()){

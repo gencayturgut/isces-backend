@@ -162,10 +162,10 @@ VALUES
 
 INSERT INTO `department`
 VALUES
-(1,'1'),
-(2,'2'),
-(3,'3'),
-(4,'4');
+(1,'Electrical Engineering'),
+(2,'Computer Engineering'),
+(3,'Mechanical Engineering'),
+(4,'Civil Engineering');
 
 
 
