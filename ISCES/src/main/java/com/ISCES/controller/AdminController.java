@@ -22,7 +22,7 @@ import java.util.List;
 @Getter
 @Setter
 @RestController
-@CrossOrigin("http://localhost:3000")
+@CrossOrigin("https://iztechelectionfrontend.herokuapp.com/")
 // Mail atma kısımları burda deploy etmeden önce bağlamalıyız!!!!!!!!
 public class AdminController {// Bütün return typeler değişebilir . Response ve Request packageına yeni classlar eklenmeli frontendden hangi bilgi istendiğine göre
 
