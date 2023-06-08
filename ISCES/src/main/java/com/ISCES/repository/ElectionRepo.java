@@ -9,4 +9,5 @@ import org.springframework.stereotype.Repository;
 public interface ElectionRepo extends JpaRepository<Election, Long> {
     Election findByIsFinished(boolean isFinished);
     Election findByElectionId(Long electionId);
+
 }

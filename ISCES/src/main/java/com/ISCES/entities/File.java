@@ -11,6 +11,7 @@ import lombok.Setter;
 @RequiredArgsConstructor
 @Table(name = "files")
 public class File {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

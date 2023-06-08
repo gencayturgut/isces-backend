@@ -24,7 +24,6 @@ public class CandidacyRequest { // it can change
     }
 
     public CandidacyRequest(Long studentNumber, MultipartFile[] files) {
-        this.message = message;
         this.studentNumber = studentNumber;
         this.files = files;
     }

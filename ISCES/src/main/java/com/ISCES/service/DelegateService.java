@@ -34,10 +34,6 @@ public class DelegateService {
         delegateRepo.delete(delegate);
     }
 
-    @Transactional
-    public List<Delegate> getAllDelegates() {
-        return delegateRepo.findAll();
-    }
 
     @Transactional
     public void save(Delegate delegate){
@@ -47,5 +43,24 @@ public class DelegateService {
     @Transactional
     public void deleteAll(){
         delegateRepo.deleteAll();
+    }
+
+    @Transactional
+    public List<Delegate> findByIsConfirmed(Boolean isConfirmed){
+        return delegateRepo.findByIsConfirmed(isConfirmed);
+    }
+
+    @Transactional
+    public Delegate findByDelegateId(Long delegateId){
+        return delegateRepo.findByDelegateId(delegateId);
+    }
+
+    @Transactional
+    public List<Delegate> findUnconfirmedCandidatesByDepartmentIdAndIsConfirmed(Long departmentId){
+        return delegateRepo.findByCandidate_Student_Department_DepartmentIdAndIsConfirmed(departmentId,null);
+    }
+
+    public List<Delegate> getAllDelegates(){
+        return delegateRepo.findAll();
     }
 }

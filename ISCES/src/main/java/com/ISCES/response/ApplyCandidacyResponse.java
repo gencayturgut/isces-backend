@@ -10,7 +10,4 @@ import lombok.Setter;
 public class ApplyCandidacyResponse {
     boolean isFolderSaved;
     boolean isDepartmentChairApproved;
-
-
-
 }

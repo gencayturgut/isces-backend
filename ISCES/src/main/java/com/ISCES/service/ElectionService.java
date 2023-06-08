@@ -54,7 +54,14 @@ public class ElectionService {
         return election != null; // checks is there  entered election
     }
 
+    @Transactional
     public Election findByElectionId(Long electionId) {
         return electionRepo.findByElectionId(electionId);
     }
+
+    @Transactional
+    public void delete(Election election){
+        electionRepo.delete(election);
+    }
+
 }

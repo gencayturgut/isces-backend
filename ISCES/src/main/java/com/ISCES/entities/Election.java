@@ -33,7 +33,6 @@ public class Election {
     @Column(name = "end_date")
     private LocalDateTime endDate;
 
-
     @Column(name = "is_finished")
     private boolean isFinished;
 

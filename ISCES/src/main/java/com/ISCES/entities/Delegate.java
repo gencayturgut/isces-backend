@@ -26,5 +26,8 @@ public class Delegate{
     @JoinColumn(name = "candidate_id")
     private Candidate candidate;
 
+    @Column(name = "is_confirmed")
+    private Boolean isConfirmed;
+
 
 }

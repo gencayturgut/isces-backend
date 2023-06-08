@@ -22,6 +22,7 @@ import java.util.List;
 @Setter
 @Getter
 @RestController
+@CrossOrigin("http://localhost:3000")
 public class StudentController { // Bütün return typeler değişebilir . Response ve Request packageına yeni classlar eklenmeli frontendden hangi bilgi istendiğine göre
 
     private StudentService studentService;
@@ -56,7 +57,7 @@ public class StudentController { // Bütün return typeler değişebilir . Respo
     // studentNumber is voter's number, departmentıd "is candidate's id.
     public ResponseEntity<VoteResponse> vote(@PathVariable Long studentNumber, @PathVariable Long candidateId) {
         String message = "Couldn't vote";
-        List<Candidate> candidateList = candidateService.findCandidateByDepartmentId(studentService.findByStudentNumber(studentNumber).getDepartment().getDepartmentId());
+        List<Candidate> candidateList = candidateService.findCandidateByDepartmentId(studentService.findByStudentNumber(studentNumber).getDepartment().getDepartmentId(),false);
         if (!studentService.findByStudentNumber(studentNumber).isVoted() &&
                 studentService.findByStudentNumber(studentNumber).getDepartment().equals(candidateService.findById(candidateId).getStudent().getDepartment())){
             // if student didn't vote   and departmentId of student and departmentId of candidate is equal.
@@ -71,7 +72,7 @@ public class StudentController { // Bütün return typeler değişebilir . Respo
         // GETMAPPING DEĞİŞECEK
 
 
-        @GetMapping("/applyToBeCandidate/{studentNumber}")// it's for students to apply to be a candidate         !!!!!!!!! BELGE EKLEME YAPARKEN BU KISIMDA DEĞİŞİKLİK YAPILACAK !!!!!
+    @GetMapping("/applyToBeCandidate/{studentNumber}")// it's for students to apply to be a candidate         !!!!!!!!! BELGE EKLEME YAPARKEN BU KISIMDA DEĞİŞİKLİK YAPILACAK !!!!!
     public ResponseEntity<CandidacyRequest> applyToBeCandidate(@PathVariable Long studentNumber) {
         LocalDateTime now = LocalDateTime.now();
         if(electionService.isEnteredElectionDateByRector()){
@@ -82,6 +83,7 @@ public class StudentController { // Bütün return typeler değişebilir . Respo
                     studentService.findByStudentNumber(studentNumber).setIsAppliedForCandidacy(true);// The isAppliedForCandidacy of the student applying for candidacy has been changed.
                     studentService.save(studentService.findByStudentNumber(studentNumber)); // changes are saved for this student.
                     if (studentService.findByStudentNumber(studentNumber).getGrade() > 2.50) {
+
                         CandidacyRequest candidacyRequest = new CandidacyRequest(studentNumber, "Your application is succesful!"); // it's for student who is not applied for candidacy before for this election.
                         return ResponseEntity.ok(candidacyRequest);
                     }
@@ -107,7 +109,7 @@ public class StudentController { // Bütün return typeler değişebilir . Respo
 
 
 
-    @PostMapping("/uploadFolder")
+    @GetMapping("/uploadFolder")
     public ResponseEntity<ApplyCandidacyResponse> uploadFolder(@RequestParam("studentNumber") Long studentNumber,
                                                                   @RequestParam("files") MultipartFile[] files) throws Exception {
         CandidacyRequest request = new CandidacyRequest(studentNumber,files);

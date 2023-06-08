@@ -36,6 +36,10 @@ public class UserService {
     }
 
 
+    @Transactional
+    public void save(User user){
+        userRepo.save(user);
+    }
 
 
 }

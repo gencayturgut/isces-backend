@@ -28,4 +28,8 @@ public class Candidate{
     @JoinColumn(name = "student_number")
     private Student student;
 
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name= "election_id")
+    private Election election;
+
 }

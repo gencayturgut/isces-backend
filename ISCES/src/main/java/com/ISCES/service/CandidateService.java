@@ -3,6 +3,7 @@ package com.ISCES.service;
 
 import com.ISCES.entities.Candidate;
 import com.ISCES.repository.CandidateRepo;
+import com.ISCES.repository.ElectionRepo;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +17,12 @@ import java.util.List;
 @Service
 public class CandidateService {
     private CandidateRepo candidateRepo;
+    private ElectionRepo electionRepo;
 
     @Autowired
-    public CandidateService(CandidateRepo candidateRepo) {
+    public CandidateService(CandidateRepo candidateRepo, ElectionRepo electionRepo) {
         this.candidateRepo = candidateRepo;
+        this.electionRepo = electionRepo;
     }
 
     public List<Candidate> getAllCandidates(){
@@ -46,8 +49,8 @@ public class CandidateService {
 
 
     @Transactional
-    public List<Candidate> findCandidateByDepartmentId(Long departmentId){
-        return candidateRepo.findByStudent_Department_DepartmentId(departmentId);
+    public List<Candidate> findCandidateByDepartmentId(Long departmentId, Boolean isFinished){
+        return candidateRepo.findByStudent_Department_DepartmentIdAndElection_IsFinished(departmentId, isFinished);
     }
 
 
@@ -61,13 +64,33 @@ public class CandidateService {
     }
 
     @Transactional
-    public Candidate findByVotes(Long votes){
-        return candidateRepo.findByVotes(votes);
+    public List<Candidate> findByVotes(Long votes,Long departmentId){
+        return candidateRepo.findByVotesAndElection_IsFinishedAndStudent_Department_DepartmentId(votes,false,departmentId);
     }
 
     @Transactional
     public void deleteAll(){
         candidateRepo.deleteAll();
     }
+
+
+    @Transactional
+    public List<Candidate> findPreviousElectionCandidates(Long departmentId){
+        Long lastElectionId = Long.valueOf(electionRepo.findAll().size());
+        if(lastElectionId == 0){
+            return null;
+        }
+        System.out.println(candidateRepo.findAll().get(0).getElection().getElectionId());
+        System.out.println(candidateRepo.findAll().get(0).getStudent().getDepartment().getDepartmentId());
+        System.out.println(candidateRepo.findByElection_ElectionIdAndStudent_Department_DepartmentId(lastElectionId,departmentId));
+        return candidateRepo.findByElection_ElectionIdAndStudent_Department_DepartmentId(lastElectionId,departmentId);
+    }
+
+    @Transactional
+    public List<Candidate> findByElectionId(Long electionId){
+        return candidateRepo.findByElection_ElectionId(electionId);
+    }
+
+
 
 }
