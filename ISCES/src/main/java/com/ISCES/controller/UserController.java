@@ -26,7 +26,7 @@ import java.util.List;
 
 
 @RestController
-@CrossOrigin("https://iztechelectionfrontend.herokuapp.com/")
+@CrossOrigin("https://iztechelectionfrontend.herokuapp.com")
 public class UserController { // Bütün return typeler değişebilir . Response ve Request packageına yeni classlar eklenmeli frontendden hangi bilgi istendiğine göre
 
 

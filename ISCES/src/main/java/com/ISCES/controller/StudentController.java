@@ -22,7 +22,7 @@ import java.util.List;
 @Setter
 @Getter
 @RestController
-@CrossOrigin("https://iztechelectionfrontend.herokuapp.com/")
+@CrossOrigin("https://iztechelectionfrontend.herokuapp.com")
 public class StudentController { // Bütün return typeler değişebilir . Response ve Request packageına yeni classlar eklenmeli frontendden hangi bilgi istendiğine göre
 
     private StudentService studentService;
