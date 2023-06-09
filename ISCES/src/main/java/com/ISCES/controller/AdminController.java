@@ -190,7 +190,10 @@ public class AdminController {// Bütün return typeler değişebilir . Response
     @GetMapping("/finishElection")
     public Election finishElection(){ //  cancels election
         Election election = electionService.getAllElections().get(electionService.getAllElections().size() - 1);
-
+        List<Candidate> candidateList = candidateService.findByElectionId(election.getElectionId());
+        for(Candidate candidate: candidateList){
+            candidateService.deleteCandidate(candidate);
+        }
         // buraya de electionın bittiğinde userlara sonuçlara bakabileceğini söyleyen bir mail yollamamız lazım !!!!!!!!!!!!
         if(!election.isFinished()){ // if isFinished of last election is false  -> if election hasn't ended yet.
             electionService.delete(election); // save election to database
