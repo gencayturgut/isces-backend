@@ -36,10 +36,10 @@ public class AdminController {// Bütün return typeler değişebilir . Response
     private EmailService emailService;
     private Email2Service email2Service;
     private FolderService folderService;
-    private DownloadService downloadService;
+    private AWSService awsService;
 
 
-    public AdminController(DownloadService downloadService,FolderService folderService,Email2Service email2Service, EmailService emailService, DelegateService delegateService, CandidateService candidateService, UserService userService, StudentService studentService, AdminService adminService,ElectionService electionService) {
+    public AdminController(AWSService awsService,FolderService folderService,Email2Service email2Service, EmailService emailService, DelegateService delegateService, CandidateService candidateService, UserService userService, StudentService studentService, AdminService adminService,ElectionService electionService) {
         this.emailService = emailService;
         this.candidateService = candidateService;
         this.userService = userService;
@@ -49,7 +49,7 @@ public class AdminController {// Bütün return typeler değişebilir . Response
         this.delegateService = delegateService;
         this.email2Service = email2Service;
         this.folderService = folderService;
-        this.downloadService = downloadService;
+        this.awsService = awsService;
     }
 
 
@@ -61,7 +61,7 @@ public class AdminController {// Bütün return typeler değişebilir . Response
     }                                                                                                         //  true means this student is applied for candidacy.
 
 
-                                                         // departmentId is departmentİd of officer and unevaluatedStudents
+    // departmentId is departmentİd of officer and unevaluatedStudents
     @GetMapping("/showConfirmedStudents/{departmentId}") // confirmedStudents means candidates
     public List<Candidate> getConfirmedStudents(@PathVariable  Long departmentId){
         return candidateService.findCandidateByDepartmentId(departmentId,false); //  it returns the candidate  list grouped by officer who are approved.
@@ -69,11 +69,11 @@ public class AdminController {// Bütün return typeler değişebilir . Response
 
 
 
-                                                        // departmentId is departmentİd of officer and unevaluatedStudents
+    // departmentId is departmentİd of officer and unevaluatedStudents
     @GetMapping("/showRejectedStudents/{departmentId}") // if we need this for officer, we should this implement again...!!!
     public List<Student> getRejectedStudents(@PathVariable  Long departmentId){
         return studentService.findByDepartmentIdAndIsAppliedForCandidacyAndUser_Role(departmentId,null,"student"); //  it returns the students who are rejected and sets isApplied null
-                                                                                                              //   because isApplied of rejected student  is null.
+        //   because isApplied of rejected student  is null.
     }
 
 
@@ -93,7 +93,7 @@ public class AdminController {// Bütün return typeler değişebilir . Response
             tempCandidate.setElection(currentElection);
             tempCandidate.getStudent().getUser().setRole("candidate"); // user role is changed as candidate
             Candidate savedCandidate = candidateService.save(tempCandidate);
-            emailService.sendEmail(studentService.findByStudentNumber(studentNumber).getUser().getEmail(),true); //  sends email for confirmed students.
+            emailService.sendEmail(studentService.findByStudentNumber(studentNumber).getUser().getEmail(),true); //  sends email for confirmed students
             return candidateService.save(tempCandidate); // it returns the candidate who is approved by officer.
         }
         return tempCandidate;
@@ -103,12 +103,12 @@ public class AdminController {// Bütün return typeler değişebilir . Response
     @GetMapping("/rejectStudent/{studentNumber}") //  it returns student . If applications is not approved by officer , student is still student not candidate!!
     public Student rejectStudent(@PathVariable Long studentNumber){// candidacy of candidate is disapproved.
         if(studentService.findByStudentNumber(studentNumber).getIsAppliedForCandidacy() &&
-            !studentService.findByStudentNumber(studentNumber).getUser().getRole().equals("candidate")){
+                !studentService.findByStudentNumber(studentNumber).getUser().getRole().equals("candidate")){
             studentService.findByStudentNumber(studentNumber).setIsAppliedForCandidacy(null); // isAppliedCandidacy of student is changed to null
-            emailService.sendEmail(studentService.findByStudentNumber(studentNumber).getUser().getEmail(),false);
+            emailService.sendEmail(studentService.findByStudentNumber(studentNumber).getUser().getEmail(),false); //  sends email for rejected students
             return studentService.save(studentService.findByStudentNumber(studentNumber));// It returns and saves the student who is rejected by officer.
         }
-       //  sends email for rejected students
+
         return null;
     }
 
@@ -130,10 +130,11 @@ public class AdminController {// Bütün return typeler değişebilir . Response
                 tempElection.setFinished(false);
                 tempElection.setStartDate(electionRequest.getStartDate());
                 tempElection.setEndDate(electionRequest.getEndDate());
+
                 for (Student student : studentService.getAllStudents()) {
                     if (student.isVoted()) { //  isVoted of voters are changed to false  for next year election
                         student.setVoted(false);
-                        studentService.save(student);
+                        studentService.save(student);   //
                     }
                     if(student.getIsAppliedForCandidacy() == null){
                         student.setIsAppliedForCandidacy(false);
@@ -147,10 +148,10 @@ public class AdminController {// Bütün return typeler değişebilir . Response
                         student.getUser().setRole("student");
                         studentService.save(student);
                     }
-
                 }
                 try {
                     electionService.save(tempElection);
+                    awsService.deleteFolders();
                     for(Student student: studentService.getAllStudents()){ //  sends all students election start date and end date.
                         email2Service.sendEmail(student.getUser().getEmail(),electionRequest.getStartDate(),electionRequest.getEndDate());
                     }
@@ -190,12 +191,11 @@ public class AdminController {// Bütün return typeler değişebilir . Response
     @GetMapping("/finishElection")
     public Election finishElection(){ //  cancels election
         Election election = electionService.getAllElections().get(electionService.getAllElections().size() - 1);
+        // buraya de electionın bittiğinde userlara sonuçlara bakabileceğini söyleyen bir mail yollamamız lazım !!!!!!!!!!!!
         List<Candidate> candidateList = candidateService.findByElectionId(election.getElectionId());
         for(Candidate candidate: candidateList){
-            candidate.getStudent().getUser().setRole("student");
             candidateService.deleteCandidate(candidate);
         }
-        // buraya de electionın bittiğinde userlara sonuçlara bakabileceğini söyleyen bir mail yollamamız lazım !!!!!!!!!!!!
         if(!election.isFinished()){ // if isFinished of last election is false  -> if election hasn't ended yet.
             electionService.delete(election); // save election to database
         }
@@ -204,9 +204,9 @@ public class AdminController {// Bütün return typeler değişebilir . Response
 
 
 
-    @GetMapping("/downloadStudentFiles/{studentNumber}")
-    public ResponseEntity<InputStreamResource> downloadStudentFolders(@PathVariable Long studentNumber) throws IOException, IOException {
-        return downloadService.downloadStudentFolders(studentNumber);
+    @GetMapping("/downloadDocument/{studentNumber}")
+    public ResponseEntity<byte[]> downloadStudentFolders(@PathVariable Long studentNumber) throws IOException, IOException {
+        return awsService.downloadDocument(studentNumber);
     }
 
 

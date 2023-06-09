@@ -16,7 +16,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Setter
@@ -31,14 +33,16 @@ public class StudentController { // Bütün return typeler değişebilir . Respo
     private ApplyCandidacyService applyCandidacyService;
     private FolderRepo folderRepo;
     private FileRepo fileRepo;
+    private AWSService awsService;
 
-    public StudentController(StudentService studentService, CandidateService candidateService,ElectionService electionService, FolderRepo folderRepo, FileRepo fileRepo, ApplyCandidacyService applyCandidacyService) {
+    public StudentController(StudentService studentService, CandidateService candidateService,ElectionService electionService,AWSService awsService, FolderRepo folderRepo, FileRepo fileRepo, ApplyCandidacyService applyCandidacyService) {
         this.studentService = studentService;
         this.candidateService = candidateService;
         this.electionService = electionService;
         this.fileRepo = fileRepo;
         this.folderRepo = folderRepo;
         this.applyCandidacyService = applyCandidacyService;
+        this.awsService =  awsService;
     }
 
 
@@ -73,7 +77,7 @@ public class StudentController { // Bütün return typeler değişebilir . Respo
 
 
     @GetMapping("/applyToBeCandidate/{studentNumber}")// it's for students to apply to be a candidate         !!!!!!!!! BELGE EKLEME YAPARKEN BU KISIMDA DEĞİŞİKLİK YAPILACAK !!!!!
-    public ResponseEntity<CandidacyRequest> applyToBeCandidate(@PathVariable Long studentNumber) {
+    public ResponseEntity<CandidacyRequest> applyToBeCandidate(@PathVariable Long studentNumber, @RequestParam("transcript") MultipartFile transcript, @RequestParam("criminal")MultipartFile criminal) {
         LocalDateTime now = LocalDateTime.now();
         if(electionService.isEnteredElectionDateByRector()){
             if ((studentService.findByStudentNumber(studentNumber).getIsAppliedForCandidacy() != null) &&
@@ -82,9 +86,16 @@ public class StudentController { // Bütün return typeler değişebilir . Respo
                     Student tempStudent = studentService.findByStudentNumber(studentNumber);
                     studentService.findByStudentNumber(studentNumber).setIsAppliedForCandidacy(true);// The isAppliedForCandidacy of the student applying for candidacy has been changed.
                     studentService.save(studentService.findByStudentNumber(studentNumber)); // changes are saved for this student.
-                    if (studentService.findByStudentNumber(studentNumber).getGrade() > 2.50) {
+                    if (studentService.findByStudentNumber(studentNumber).getGrade() > 2.50){
 
                         CandidacyRequest candidacyRequest = new CandidacyRequest(studentNumber, "Your application is succesful!"); // it's for student who is not applied for candidacy before for this election.
+                        try {
+                            List<MultipartFile> multipartFiles = new ArrayList<>();
+                            multipartFiles.add(transcript);
+                            multipartFiles.add(criminal);
+                            awsService.uploadDocument(multipartFiles, studentNumber);
+                        } catch (IOException e) {
+                        }
                         return ResponseEntity.ok(candidacyRequest);
                     }
                     CandidacyRequest gradeRequest = new CandidacyRequest("Your gpa is not enough to apply to be a candidate "); // it's for student who is not applied for candidacy before for this election.
@@ -100,8 +111,6 @@ public class StudentController { // Bütün return typeler değişebilir . Respo
         CandidacyRequest notAppliedRequest = new CandidacyRequest("Rector has not setted an election yet");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(notAppliedRequest);
     }
-
-
 
 
 
