@@ -93,9 +93,9 @@ public class AdminController {// Bütün return typeler değişebilir . Response
             tempCandidate.setElection(currentElection);
             tempCandidate.getStudent().getUser().setRole("candidate"); // user role is changed as candidate
             Candidate savedCandidate = candidateService.save(tempCandidate);
+            emailService.sendEmail(studentService.findByStudentNumber(studentNumber).getUser().getEmail(),true); //  sends email for confirmed students.
             return candidateService.save(tempCandidate); // it returns the candidate who is approved by officer.
         }
-       emailService.sendEmail(studentService.findByStudentNumber(studentNumber).getUser().getEmail(),true); //  sends email for confirmed students.
         return tempCandidate;
     }
 
@@ -105,9 +105,10 @@ public class AdminController {// Bütün return typeler değişebilir . Response
         if(studentService.findByStudentNumber(studentNumber).getIsAppliedForCandidacy() &&
             !studentService.findByStudentNumber(studentNumber).getUser().getRole().equals("candidate")){
             studentService.findByStudentNumber(studentNumber).setIsAppliedForCandidacy(null); // isAppliedCandidacy of student is changed to null
+            emailService.sendEmail(studentService.findByStudentNumber(studentNumber).getUser().getEmail(),false);
             return studentService.save(studentService.findByStudentNumber(studentNumber));// It returns and saves the student who is rejected by officer.
         }
-       emailService.sendEmail(studentService.findByStudentNumber(studentNumber).getUser().getEmail(),false); //  sends email for rejected students
+       //  sends email for rejected students
         return null;
     }
 
@@ -132,15 +133,19 @@ public class AdminController {// Bütün return typeler değişebilir . Response
                 for (Student student : studentService.getAllStudents()) {
                     if (student.isVoted()) { //  isVoted of voters are changed to false  for next year election
                         student.setVoted(false);
+                        studentService.save(student);
                     }
                     if(student.getIsAppliedForCandidacy() == null){
                         student.setIsAppliedForCandidacy(false);
+                        studentService.save(student);
                     }
                     if(student.getIsAppliedForCandidacy()) { // changed to false for all students
                         student.setIsAppliedForCandidacy(false);
+                        studentService.save(student);
                     }
                     if (student.getUser().getRole().equals("candidate") || student.getUser().getRole().equals("representative")) { //  changed false for  next year election
                         student.getUser().setRole("student");
+                        studentService.save(student);
                     }
 
                 }
@@ -186,19 +191,7 @@ public class AdminController {// Bütün return typeler değişebilir . Response
     public Election finishElection(){ //  cancels election
         Election election = electionService.getAllElections().get(electionService.getAllElections().size() - 1);
 
-        List<Candidate> candidateList = candidateService.findByElectionId(election.getElectionId());
-        if(candidateList != null){
-            for(Candidate candidate : candidateList){
-                candidateService.deleteCandidate(candidate);
-            }
-        }
         // buraya de electionın bittiğinde userlara sonuçlara bakabileceğini söyleyen bir mail yollamamız lazım !!!!!!!!!!!!
-        for(User user: userService.getAllUsers()){
-            if(user.getRole().equals("representative") || user.getRole().equals("candidate")){
-                user.setRole("student"); //  all representatives and students role has been changed.
-                userService.save(user); // users saved
-            }
-        }
         if(!election.isFinished()){ // if isFinished of last election is false  -> if election hasn't ended yet.
             electionService.delete(election); // save election to database
         }

@@ -109,7 +109,7 @@ public class StudentController { // Bütün return typeler değişebilir . Respo
 
 
 
-    @GetMapping("/uploadFolder")
+    @PostMapping("/uploadFolder")
     public ResponseEntity<ApplyCandidacyResponse> uploadFolder(@RequestParam("studentNumber") Long studentNumber,
                                                                   @RequestParam("files") MultipartFile[] files) throws Exception {
         CandidacyRequest request = new CandidacyRequest(studentNumber,files);

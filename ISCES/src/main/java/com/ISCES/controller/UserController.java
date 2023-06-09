@@ -134,6 +134,7 @@ public class UserController { // Bütün return typeler değişebilir . Response
                             userService.save(user);// role is setted as representative
                             //  candidate ,user and student  saved the changes.
                             Delegate delegate = new Delegate(delegateId, candidate.get(0),true); // new delegate has been created.
+                            delegate.getCandidate().getStudent().getUser().setRole("representative");
                             delegateService.save(delegate);
                             // added representative to list.
                         }
@@ -146,6 +147,10 @@ public class UserController { // Bütün return typeler değişebilir . Response
                         }
                     }
 
+                }
+                for(Student student: studentService.getAllStudents()){
+                    student.setVoted(false);
+                    studentService.save(student);
                 }
                 Election tempElection = electionService.findByIsFinished(false);
                 tempElection.setFinished(true);
