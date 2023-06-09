@@ -77,7 +77,7 @@ public class StudentController { // Bütün return typeler değişebilir . Respo
 
 
     @GetMapping("/applyToBeCandidate/{studentNumber}")// it's for students to apply to be a candidate         !!!!!!!!! BELGE EKLEME YAPARKEN BU KISIMDA DEĞİŞİKLİK YAPILACAK !!!!!
-    public ResponseEntity<CandidacyRequest> applyToBeCandidate(@PathVariable Long studentNumber, @RequestParam("transcript") MultipartFile transcript, @RequestParam("criminal") MultipartFile criminal) {
+    public ResponseEntity<CandidacyRequest> applyToBeCandidate(@PathVariable Long studentNumber) {
         LocalDateTime now = LocalDateTime.now();
         if(electionService.isEnteredElectionDateByRector()){
             if ((studentService.findByStudentNumber(studentNumber).getIsAppliedForCandidacy() != null) &&
@@ -89,13 +89,13 @@ public class StudentController { // Bütün return typeler değişebilir . Respo
                     if (studentService.findByStudentNumber(studentNumber).getGrade() > 2.50){
 
                         CandidacyRequest candidacyRequest = new CandidacyRequest(studentNumber, "Your application is succesful!"); // it's for student who is not applied for candidacy before for this election.
-                        try {
+                        /*try {
                             List<MultipartFile> multipartFiles = new ArrayList<>();
                             multipartFiles.add(transcript);
                             multipartFiles.add(criminal);
                             awsService.uploadDocument(multipartFiles, studentNumber);
                         } catch (IOException e) {
-                        }
+                        }*/
                         return ResponseEntity.ok(candidacyRequest);
                     }
                     CandidacyRequest gradeRequest = new CandidacyRequest("Your gpa is not enough to apply to be a candidate "); // it's for student who is not applied for candidacy before for this election.

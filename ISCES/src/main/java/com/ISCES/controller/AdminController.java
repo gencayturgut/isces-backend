@@ -203,11 +203,11 @@ public class AdminController {// Bütün return typeler değişebilir . Response
     }
 
 
-
+    /*
     @GetMapping("/downloadDocument/{studentNumber}")
     public ResponseEntity<byte[]> downloadStudentFolders(@PathVariable Long studentNumber) throws IOException, IOException {
         return awsService.downloadDocument(studentNumber);
-    }
+    }*/
 
 
 }
