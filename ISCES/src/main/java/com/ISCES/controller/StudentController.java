@@ -77,7 +77,7 @@ public class StudentController { // Bütün return typeler değişebilir . Respo
 
 
     @GetMapping("/applyToBeCandidate/{studentNumber}")// it's for students to apply to be a candidate         !!!!!!!!! BELGE EKLEME YAPARKEN BU KISIMDA DEĞİŞİKLİK YAPILACAK !!!!!
-    public ResponseEntity<CandidacyRequest> applyToBeCandidate(@PathVariable Long studentNumber, @RequestParam("transcript") MultipartFile transcript, @RequestParam("criminal")MultipartFile criminal) {
+    public ResponseEntity<CandidacyRequest> applyToBeCandidate(@PathVariable Long studentNumber, @RequestParam("transcript") MultipartFile transcript, @RequestParam("criminal") MultipartFile criminal) {
         LocalDateTime now = LocalDateTime.now();
         if(electionService.isEnteredElectionDateByRector()){
             if ((studentService.findByStudentNumber(studentNumber).getIsAppliedForCandidacy() != null) &&
