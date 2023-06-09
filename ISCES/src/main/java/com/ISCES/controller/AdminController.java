@@ -192,6 +192,7 @@ public class AdminController {// Bütün return typeler değişebilir . Response
         Election election = electionService.getAllElections().get(electionService.getAllElections().size() - 1);
         List<Candidate> candidateList = candidateService.findByElectionId(election.getElectionId());
         for(Candidate candidate: candidateList){
+            candidate.getStudent().getUser().setRole("student");
             candidateService.deleteCandidate(candidate);
         }
         // buraya de electionın bittiğinde userlara sonuçlara bakabileceğini söyleyen bir mail yollamamız lazım !!!!!!!!!!!!
